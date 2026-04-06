@@ -1,46 +1,46 @@
-# Summary and notes (written as I read. Needed to crystalize my memory)
-> **Quick Note**: The practical reference is hello.c, inside the folder of the same name.
-##1.1
-The source program or source file of a program is a sequence of bits (aka binary) organized in 8-bit chuncks which are called bytes.
+# Summary and Notes: CS:APP (Chapter 1)
 
-Most computer systems use ASCII, which represents each different character by the value of a byte-sized integer value.
+> **Quick Note**: Practical exercises and source code are located in the `hello/` subdirectory.
 
-Since hello.c and any other source program/file is stored as a sequence of bytes, each character written has it's own byte value stored.
+## 1.1 Information is Bits + Context
+All information in a computer system—files on disk, programs in memory, or data on a network—is represented as a **sequence of bits**.
 
-Something interesting is that even "\n" (new line) has its own ASCII value, represented by the value 10.
+* **Bytes**: Bits are organized into 8-bit chunks called bytes.
+* **ASCII**: Most systems represent text characters using the ASCII standard, where each character has a unique byte-sized integer value (e.g., `#` is 35, `i` is 105).
+* **The Invisible `\n`**: Even the newline character is stored as a byte (Value 10 in ASCII).
+* **The Power of Context**: The only thing that distinguishes different data objects (integers, strings, instructions) is the **context** in which we view them.
+* **Approximations**: Machine representations of numbers are finite approximations; they can behave in unexpected ways (like overflows), which is the core of Chapter 2.
 
-The important thing to catch here, is understanding that everything is converted in some way or another, into bits and bytes.
 
-It is important to understand that everything done in this format are representations of numbers made into 1s and 0s that at the end of the day (or line), are simply
-approximations of real numbers that may (or may not) behave in weird or unexpected ways.
+## 1.2 Programs are Translated by Others into Different Forms
+To run `hello.c`, the high-level C code must be translated into a sequence of low-level **machine-language instructions**. This is done by a **compiler driver**.
 
-##1.2
-A written program in C, always starts as High-Level since it's readable by humans. But, computers can't understand well this, so what does it do?
-It converts our C code into a readable (mostly for them) sequence of low-level instructions. This instructions are then, converted into a executable program and stored
-as binary inside the disk.
+### The Compilation System
+The translation happens in four distinct phases:
 
-The translation of the program is made by a compiler driver:
-hello.c -> Preprocessor (cpp) -> hello.i -> Compiler (cc1) -> hello.s -> Assembler (as) -> hello.o (Linux) or .obj (Windows) -> Linker (ld) which grabs printf from the header-> hello.exe
+| Phase | Tool | Process | Result |
+| :--- | :--- | :--- | :--- |
+| **Preprocessing** | `cpp` | Handles directives (`#`). Injects header content (like `stdio.h`) directly into the file. | `hello.i` (Expanded C) |
+| **Compilation** | `cc1` | Translates the high-level C code into **Assembly language**. | `hello.s` (Text ASM) |
+| **Assembly** | `as` | Translates ASM into machine-language instructions (binary). | `hello.o` / `hello.obj` |
+| **Linking** | `ld` | Merges your object file with pre-compiled library objects (like `printf.o`). | `hello.exe` (Executable) |
 
-zig cc hello.c -o hello.exe
 
-| Phase | What happens |
-| :--- | :--- |
-| `Preprocessing phase` | The preprocessor checks for headers (The "#" in the #include <stdio.h>), which tells it to go and grab whatever is in there and add it to the main program. Which results in a bigger C program, generally with the suffix .i |
-| `Compilation phase` | The compiler translates de .i file into a .s, which stores the low-level instructions in ASM (Assembly language). |
-| `Assembly phase` | It grabs the .s and makes it a .o file in Linux or a .obj file for Windows. If you wonder how does it store everything, well, it's just machine language, if you were to put it in a text editor, it would be pure gibberish. |
-| `Linking phase` | If you notice, the hello.c program calls the printf function, which is part of the standard C library and it's its own objetc (.o/.obj). The job of the linker is to merge both objects and convert them into an executable. |
+## 1.3 Practical Analysis: Assembly (x86-64 Windows)
+Using the Zig toolchain (`zig cc -S hello.c`), we can inspect the generated assembly. While the raw output contains many directives for the OS (like `.seh`), the core logic looks like this:
 
-```main:                  # Where the program starts
-    pushq   %rbp       # Saves the pointer from the base
-    subq    $32, %rsp  # Reserves 32 bytes in the stack
+```assembly
+main:                  # Program Entry Point
+    pushq   %rbp       # Save the base pointer (Setup)
+    subq    $32, %rsp  # Reserve 32 bytes in the stack (Allocation)
     
-    callq   __main     # Calls the start of the system
+    callq   __main     # Initialize the C Runtime Environment
     
-	>The section where the logic is (printf and etc.)
+    # --- Logic (printf, etc.) would go here ---
     
-    addq    $32, %rsp  # Frees the memory that was reserved
-    popq    %rbp       # Restores the original pointer
-    retq               # Returns to the OS```
-	
->This is the simplified assembly for x86-64 for Windows, in the Intel/AMD dialect.
+    addq    $32, %rsp  # Free reserved stack memory (Cleanup)
+    popq    %rbp       # Restore the original base pointer
+    retq               # Return control to the Operating System
+```
+
+> **Key Takeaway**: Assembly reveals the "Symmetry of the Stack". Notice how the `subq` (requesting memory) is perfectly balanced by the `addq` (releasing memory) at the end. This is fundamental for memory safety in Embedded Systems.
