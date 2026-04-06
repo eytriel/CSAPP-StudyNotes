@@ -1,0 +1,4 @@
+CompileFlags: Add: [ "-I", "C:/Users/msi/Music/zig-x86_64-windows-0.16.0-dev.3070+b22eb176b/lib/include",
+                    "-I", "C:/Users/msi/Music/zig-x86_64-windows-0.16.0-dev.3070+b22eb176b/lib/libc/include/any-windows-any", 
+                    "-I", "C:/Users/msi/Music/zig-x86_64-windows-0.16.0-dev.3070+b22eb176b/lib/libc/include/x86_64-windows-gnu", 
+                    "-I", "C:/Users/msi/Music/zig-x86_64-windows-0.16.0-dev.3070+b22eb176b/lib/include/llvm_libc_wrappers"]
