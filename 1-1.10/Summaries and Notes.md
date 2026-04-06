@@ -26,19 +26,12 @@ zig cc hello.c -o hello.exe
 
 | Phase | What happens |
 | :--- | :--- |
-| `Preprocessing phase` | The preprocessor checks for headers (The "#" in the #include <stdio.h>),
-							which tells it to go and grab whatever is in there and add it to the main program.
-							Which results in a bigger C program,
-							generally with the suffix .i |
+| `Preprocessing phase` | The preprocessor checks for headers (The "#" in the #include <stdio.h>), which tells it to go and grab whatever is in there and add it to the main program. Which results in a bigger C program, generally with the suffix .i |
 | `Compilation phase` | The compiler translates de .i file into a .s, which stores the low-level instructions in ASM (Assembly language). |
-| `Assembly phase` | It grabs the .s and makes it a .o file in Linux or a .obj file for Windows.
-					If you wonder how does it store everything, well, it's just machine language,
-					if you were to put it in a text editor, it would be pure gibberish. |
-| `Linking phase` | If you notice, the hello.c program calls the printf function, 
-					which is part of the standard C library and it's its own objetc (.o/.obj).
-					The job of the linker is to merge both objects and convert them into an executable. |
+| `Assembly phase` | It grabs the .s and makes it a .o file in Linux or a .obj file for Windows. If you wonder how does it store everything, well, it's just machine language, if you were to put it in a text editor, it would be pure gibberish. |
+| `Linking phase` | If you notice, the hello.c program calls the printf function, which is part of the standard C library and it's its own objetc (.o/.obj). The job of the linker is to merge both objects and convert them into an executable. |
 
-main:                  # Where the program starts
+```main:                  # Where the program starts
     pushq   %rbp       # Saves the pointer from the base
     subq    $32, %rsp  # Reserves 32 bytes in the stack
     
@@ -48,6 +41,6 @@ main:                  # Where the program starts
     
     addq    $32, %rsp  # Frees the memory that was reserved
     popq    %rbp       # Restores the original pointer
-    retq               # Returns to the OS
+    retq               # Returns to the OS```
 	
 >This is the simplified assembly for x86-64 for Windows, in the Intel/AMD dialect.
