@@ -1,4 +1,4 @@
-# Experimento 01: Anatomía del Binario (Capítulo 1)
+# Hello.c: Experimentando con el compilador (Capítulo 1)
 
 ## Objetivo
 Entender la diferencia de tamaño entre un binario de depuración y uno optimizado.
